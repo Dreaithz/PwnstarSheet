@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>P W N S T A R S</title>
+<link rel="stylesheet" href="style.css">
+<script src="script.js" defer></script>
+
+<button class="menu-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')" aria-label="Toggle menu">≡</button>
+
+<div class="app">
+  <nav class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-brand">
+        <div class="sidebar-title">PwnstarSheet</div>
+        <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme" title="Toggle light / dark mode">
+          <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2m0 14v2M4.22 4.22l1.42 1.42m12.72 12.72 1.42 1.42M3 12h2m14 0h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42M12 7a5 5 0 1 0 0 10A5 5 0 0 0 12 7z"/></svg>
+          <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+      </div>
+      <div class="sidebar-sub">Personal reference and toolkit for only team Neutron AKA PwnStars</div>
+    </div>
+
+    <div class="nav-groups">
+      <div class="nav-group-label">Workbench</div>
+      <button class="nav-item active" onclick="show('decoder', this)">Multi-Decoder</button>
+      <button class="nav-item" onclick="show('ascii', this)">ASCII Table</button>
+      <button class="nav-item" onclick="show('handler', this)">The Handler</button>
+
+      <div class="nav-group-label">Categories</div>
+      <button class="nav-item" onclick="show('recon', this)">Recon and OSINT</button>
+      <button class="nav-item" onclick="show('web', this)">Web Exploitation</button>
+      <button class="nav-item" onclick="show('pwn', this)">Binary Exploitation</button>
+      <button class="nav-item" onclick="show('re', this)">Reverse Engineering</button>
+      <button class="nav-item" onclick="show('crypto', this)">Cryptography</button>
+      <button class="nav-item" onclick="show('forensics', this)">Forensics and Stego</button>
+      <button class="nav-item" onclick="show('passwords', this)">Password Cracking</button>
+      <button class="nav-item" onclick="show('wireless', this)">Wireless</button>
+      <button class="nav-item" onclick="show('frameworks', this)">Exploitation Frameworks</button>
+
+      <div class="nav-group-label">Reference</div>
+      <button class="nav-item" onclick="show('forensics', this)">File Signatures</button>
+      <button class="nav-item" onclick="show('utilities', this)">Utilities and Misc</button>
+      <button class="nav-item" onclick="show('scripting', this)">Script Generator</button>
+      <button class="nav-item" onclick="show('cheatsheets', this)">Cheatsheets and Checklists</button>
+      <button class="nav-item" onclick="show('tips', this)">Quick Tips</button>
+    </div>
+
+    <div class="sidebar-footer">Owner : <br> Meiji, Dreaith, Kiyow, ToshoBread</div>
+    <div class="sidebar-footer">172 tools indexed, offline sheet </div>
+    <div class="sidebar-footer"> Note : Need further improvements. Send helf please</div>
+  </nav>
+
+  <main class="main">
+
+    <section class="page visible" id="decoder">
+      <div class="page-header">
+        <div class="page-eyebrow">Workbench</div>
+        <h1 class="page-title">Multi-Decoder</h1>
+        <p class="page-desc">Paste anything below. It instantly tries Base64, Hex, Binary, ROT13, ROT47, Atbash, Morse, URL-decoding, reversed text, and a brute-force Caesar shift. All offline, no API calls.</p>
+      </div>
+
+      <textarea class="decoder-input" id="decoderInput" placeholder="Paste ciphertext, encoded data, or any suspicious string here..." oninput="runDecoder()"></textarea>
+      <div class="decoder-results" id="decoderResults"></div>
+
+      <div class="card" style="margin-top:1.5rem;">
+        <div class="card-title">XOR single-byte brute force</div>
+        <div class="callout" style="margin-bottom:12px;"><strong>How to use:</strong> Enter hex bytes (e.g. <code>1a2b3c4d</code>). Tries all 256 single-byte XOR keys and shows results containing readable text.</div>
+        <textarea class="decoder-input" id="xorInput" style="min-height:60px;" placeholder="Enter hex bytes, e.g. 1c0a0e1b4f1a4116" oninput="runXor()"></textarea>
+        <div class="decoder-results" id="xorResults"></div>
+      </div>
+    </section>
+
+    <section class="page" id="ascii">
+      <div class="page-header">
+        <div class="page-eyebrow">Workbench</div>
+        <h1 class="page-title">ASCII Table</h1>
+        <p class="page-desc">Converting between decimal, hex, binary, and characters is constant in CTF, especially for XOR, byte manipulation, and decoding raw values. Search by character, decimal, or hex below.</p>
+      </div>
+
+      <input type="text" class="ascii-search" id="asciiSearch" placeholder="Search by character, decimal (e.g. 65), or hex (e.g. 41 or 0x41)..." oninput="filterAscii()">
+
+      <div class="ascii-scroll">
+        <table class="ascii-table">
+          <thead>
+            <tr><th>Dec</th><th>Hex</th><th>Binary</th><th>Char</th><th>Description</th></tr>
+          </thead>
+          <tbody id="asciiBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="page" id="handler">
+      <div class="page-header">
+        <div class="page-eyebrow">Workbench</div>
+        <h1 class="page-title">The Handler</h1>
+        <p class="page-desc">Upload a file, image, text, code, log, config, or PDF and describe what you need. The Handler analyzes it for hidden flags, encodings, stego clues, or anything else relevant to the challenge in front of you.</p>
+      </div>
+
+      <div class="helper-drop" id="helperDrop" onclick="document.getElementById('helperFileInput').click()">
+        <svg class="helper-drop-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 16V4M12 4l-4 4M12 4l4 4" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <div class="helper-drop-text">Click to upload, or drag &amp; drop files here</div>
+        <div class="helper-drop-sub">Images (PNG/JPG), text, code, logs, configs, PDFs, multiple files supported</div>
+      </div>
+      <input type="file" id="helperFileInput" multiple style="display:none" onchange="handleHelperFiles(this.files)">
+      <div class="helper-file-list" id="helperFileList"></div>
+
+      <textarea class="helper-prompt" id="helperPrompt" placeholder="What should The Handler look for? e.g. 'Find any hidden flag in this image' or 'Identify this cipher and decode it' or 'Explain what this pcap snippet is doing'"></textarea>
+
+      <div class="helper-suggest">
+        <span class="helper-suggest-btn" onclick="setHelperPrompt('Analyze this file for any hidden flag (format flag{...}) and explain how you found it.')">Find the flag</span>
+        <span class="helper-suggest-btn" onclick="setHelperPrompt('Identify what type of encoding or cipher this is, and decode it step by step.')">Identify cipher</span>
+        <span class="helper-suggest-btn" onclick="setHelperPrompt('Look at this image for steganography clues, unusual pixels, hidden text, metadata, or embedded data.')">Stego analysis</span>
+        <span class="helper-suggest-btn" onclick="setHelperPrompt('Explain what this code/script does and point out anything suspicious or relevant to solving a CTF challenge.')">Explain code</span>
+      </div>
+
+      <button class="helper-submit" id="helperSubmit" onclick="runHelperAnalysis()">Send to The Handler</button>
+
+      <div id="helperOutput" class="helper-output"></div>
+    </section>
+
+
+    <section class="page" id="crypto">
+      <div class="page-header">
+        <div class="page-eyebrow">Category // Crypto</div>
+        <h1 class="page-title">Cryptography</h1>
+        <p class="page-desc">Hiding or scrambling messages so only the right person can read them. In CTF, you decode them to find the flag.</p>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title"><span class="tag tag-blue">Encoding</span> Base encodings</div>
+          <div class="row"><span class="row-label">Base64</span><span class="row-val">SGVsbG8=, ends in = or ==</span></div>
+          <div class="row"><span class="row-label">Base32</span><span class="row-val">JBSWY3DP, all CAPS, A-Z 2-7</span></div>
+          <div class="row"><span class="row-label">Base58</span><span class="row-val normal">Like Bitcoin wallet addresses</span></div>
+          <div class="row"><span class="row-label">Hex</span><span class="row-val">0-9 and a-f only, even length</span></div>
+          <div class="row"><span class="row-label">Octal</span><span class="row-val">Only digits 0–7</span></div>
+          <div class="row"><span class="row-label">Binary</span><span class="row-val">Only 0s and 1s (groups of 8)</span></div>
+        </div>
+        <div class="card">
+          <div class="card-title"><span class="tag tag-purple">Classic</span> Substitution ciphers</div>
+          <div class="row"><span class="row-label">Caesar</span><span class="row-val normal">Shift alphabet by N positions</span></div>
+          <div class="row"><span class="row-label">ROT13</span><span class="row-val normal">Caesar shift 13, most common!</span></div>
+          <div class="row"><span class="row-label">Vigenère</span><span class="row-val normal">Keyword-based multi-shift cipher</span></div>
+          <div class="row"><span class="row-label">Atbash</span><span class="row-val normal">Mirror: A=Z, B=Y, C=X…</span></div>
+          <div class="row"><span class="row-label">Rail Fence</span><span class="row-val normal">Text zig-zags across rows</span></div>
+          <div class="row"><span class="row-label">Bacon</span><span class="row-val normal">Each letter = 5-char A/B pattern</span></div>
+        </div>
+        <div class="card">
+          <div class="card-title"><span class="tag tag-teal">Hashing</span> Hash functions</div>
+          <div class="row"><span class="row-label">MD5</span><span class="row-val">32 hex chars, easily cracked</span></div>
+          <div class="row"><span class="row-label">SHA1</span><span class="row-val">40 hex chars</span></div>
+          <div class="row"><span class="row-label">SHA256</span><span class="row-val">64 hex chars</span></div>
+          <div class="row"><span class="row-label">SHA512</span><span class="row-val">128 hex chars</span></div>
+          <div class="callout" style="margin-top:10px; margin-bottom:0;">Hashes are one-way. Use <strong>crackstation.net</strong> or <strong>hashcat</strong> to crack common ones.</div>
+        </div>
+        <div class="card">
+          <div class="card-title"><span class="tag tag-amber">More</span> Additional cipher types</div>
+          <div class="row"><span class="row-label">Playfair</span><span class="row-val normal">5x5 grid, encodes digraphs</span></div>
+          <div class="row"><span class="row-label">Hill Cipher</span><span class="row-val normal">Matrix multiplication based</span></div>
+          <div class="row"><span class="row-label">ADFGVX</span><span class="row-val normal">WWI cipher, letters A,D,F,G,V,X</span></div>
+          <div class="row"><span class="row-label">Polybius</span><span class="row-val normal">Letters become coordinate pairs</span></div>
+          <div class="row"><span class="row-label">Affine</span><span class="row-val normal">(ax + b) mod 26</span></div>
+          <div class="row"><span class="row-label">Pigpen</span><span class="row-val normal">Symbols based on grid/X shapes</span></div>
+          <div class="row"><span class="row-label">Brainfuck</span><span class="row-val normal">Looks like +-&lt;&gt;[].,</span></div>
+          <div class="row"><span class="row-label">Base85/91</span><span class="row-val normal">Denser, mixed-case + symbols</span></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:1.5rem;">
+        <div class="card-title">RSA attacks &amp; crypto math reference</div>
+        <div class="callout" style="margin-bottom:12px;"><strong>Key insight:</strong> RSA challenges almost always exploit a weakness in <em>key generation</em>, not the math. Check these in order:</div>
+        <div class="grid-2" style="margin-bottom:0;">
+          <div>
+            <div class="row"><span class="row-label">Small N</span><span class="row-val normal">Factor directly via FactorDB</span></div>
+            <div class="row"><span class="row-label">Common factor</span><span class="row-val normal">GCD(N1, N2) gives shared prime p</span></div>
+            <div class="row"><span class="row-label">Small e</span><span class="row-val normal">e=3, small msg → cube root attack</span></div>
+            <div class="row"><span class="row-label">Wiener's attack</span><span class="row-val normal">Small d → continued fractions</span></div>
+          </div>
+          <div>
+            <div class="row"><span class="row-label">Fermat's method</span><span class="row-val normal">p, q close together → fast factor</span></div>
+            <div class="row"><span class="row-label">p,q given</span><span class="row-val normal">φ(N)=(p-1)(q-1), d=e⁻¹ mod φ(N)</span></div>
+            <div class="row"><span class="row-label">Hash extension</span><span class="row-val normal">Append data + valid hash, no key needed</span></div>
+            <div class="row"><span class="row-label">ECB mode</span><span class="row-val normal">Identical blocks → identical ciphertext</span></div>
+          </div>
+        </div>
+        <div class="callout" style="margin-top:12px; margin-bottom:0;"><strong>Decrypt formula:</strong> c^d mod N, where d = e⁻¹ mod φ(N) and φ(N) = (p-1)(q-1)</div>
+      </div>
+
+      <div class="card" style="margin-bottom:1.5rem;">
+        <div class="card-title">How to identify unknown ciphertext</div>
+        <div class="steps">
+          <div class="step"><div class="step-num">1</div><div class="step-text">Check for <code>=</code> or <code>==</code> at the end → likely Base64</div></div>
+          <div class="step"><div class="step-num">2</div><div class="step-text">All letters, no numbers or symbols → Caesar, Vigenère, or Atbash</div></div>
+          <div class="step"><div class="step-num">3</div><div class="step-text">Only 0-9 and a-f, 32/40/64/128 chars → MD5 or SHA hash</div></div>
+          <div class="step"><div class="step-num">4</div><div class="step-text">Dots and dashes (· -) → Morse code</div></div>
+          <div class="step"><div class="step-num">5</div><div class="step-text">Looks like gibberish English → try ROT13 first</div></div>
+          <div class="step"><div class="step-num">6</div><div class="step-text">Paste into <strong>CyberChef</strong> and use "Magic" mode, it auto-detects most encodings</div></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:1.5rem;">
+        <div class="card-title">Morse code reference</div>
+        <p class="page-desc" style="margin-bottom:0.5rem;">Every letter = a pattern of dots (·) and dashes (-). Short = dot, long = dash. Used in audio, visual blinks, or raw text in challenges.</p>
+        <div class="grid-2" style="margin-top:10px; margin-bottom:1rem;">
+          <div>
+            <div class="row"><span class="row-label">Dot (·)</span><span class="row-val normal">Short beep / flash / period</span></div>
+            <div class="row"><span class="row-label">Dash (-)</span><span class="row-val normal">Long beep / flash / hyphen</span></div>
+            <div class="row"><span class="row-label">Letter gap</span><span class="row-val normal">Short pause / single space</span></div>
+          </div>
+          <div>
+            <div class="row"><span class="row-label">Word gap</span><span class="row-val normal">Longer pause / slash ( / )</span></div>
+            <div class="row"><span class="row-label">SOS</span><span class="row-val">... --- ...</span></div>
+            <div class="row"><span class="row-label">Decode online</span><span class="row-val normal">morsecode.world</span></div>
+          </div>
+        </div>
+        <div style="font-size:12px; color:var(--text-faint); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px;">Alphabet</div>
+        <div class="morse-grid" id="morseGrid"></div>
+        <div style="font-size:12px; color:var(--text-faint); text-transform:uppercase; letter-spacing:0.5px; margin:14px 0 6px;">Numbers</div>
+        <div class="morse-grid" id="morseNumbers"></div>
+      </div>
+
+      <div class="card" style="margin-bottom:1.5rem;">
+        <div class="card-title">Quick reference links</div>
+        <div class="tool-row"><span class="tool-name">dCode<a class="tool-link" href="https://www.dcode.fr/" target="_blank" rel="noopener">dcode.fr</a></span><span class="tool-desc">Identify and decode 200+ cipher types, start here when unsure what cipher you have</span></div>
+        <div class="tool-row"><span class="tool-name">CyberChef<a class="tool-link" href="https://gchq.github.io/CyberChef/" target="_blank" rel="noopener">gchq.github.io/CyberChef</a></span><span class="tool-desc">"Magic" mode auto-detects most encodings/ciphers</span></div>
+        <div class="tool-row"><span class="tool-name">FactorDB<a class="tool-link" href="http://factordb.com/" target="_blank" rel="noopener">factordb.com</a></span><span class="tool-desc">Database of pre-factored large numbers, paste RSA modulus N here</span></div>
+        <div class="tool-row"><span class="tool-name">Quipqiup<a class="tool-link" href="https://quipqiup.com/" target="_blank" rel="noopener">quipqiup.com</a></span><span class="tool-desc">Automatic substitution cipher solver using letter frequency</span></div>
+        <div class="tool-row"><span class="tool-name">HashLengthExt<a class="tool-link" href="https://github.com/iagox86/hash_extender" target="_blank" rel="noopener">github.com/hash_extender</a></span><span class="tool-desc">Hash length-extension attack tool (MD5, SHA1, SHA256)</span></div>
+      </div>
+
+      <h2 style="font-size:16px; font-weight:700; margin-bottom:0.75rem;">Cryptography toolkit (from your arsenal)</h2>
+      <div class="legend">
+        <div class="legend-item"><span class="pri-badge pri-must">Must Master</span> Learn first, 80%+ of challenges</div>
+        <div class="legend-item"><span class="pri-badge pri-imp">Important</span> Expand once basics are down</div>
+        <div class="legend-item"><span class="pri-badge pri-use">Useful</span> Situational</div>
+      </div>
+      <div class="tool-grid" id="toolgrid-crypto"></div>
+    </section>
+
+ 
+    <section class="page" id="recon">
+      <div class="page-header">
+        <div class="page-eyebrow">Category // Recon</div>
+        <h1 class="page-title">Recon &amp; OSINT</h1>
+        <p class="page-desc">Open Source Intelligence and reconnaissance, finding clues from publicly available info, mapping attack surface, and geolocating images using only visual evidence.</p>
+      </div>
+
+      <div class="card" style="margin-bottom:1.5rem;">
+        <div class="card-title">Understanding coordinates (lat / long)</div>
+        <div class="grid-2" style="margin-bottom:0;">
+          <div>
+            <div class="row"><span class="row-label">Latitude (N/S)</span><span class="row-val">14.5995° N</span></div>
+            <div class="row"><span class="row-label normal" style="min-width:auto">&nbsp;</span><span class="row-val normal" style="color:var(--text-faint); font-size:12px;">-90° (South Pole) to +90° (North Pole)</span></div>
+            <div class="row"><span class="row-label">Longitude (E/W)</span><span class="row-val">120.9842° E</span></div>
+            <div class="row"><span class="row-label normal" style="min-width:auto">&nbsp;</span><span class="row-val normal" style="color:var(--text-faint); font-size:12px;">-180° to +180° (0° = Greenwich)</span></div>
+          </div>
+          <div>
+            <div class="callout" style="margin-bottom:8px;"><strong>Example, Manila:</strong> 14.5995°N, 120.9842°E. Right-click any spot in Google Maps to get its coordinates.</div>
+            <div class="callout" style="margin-bottom:0;"><strong>Memory trick:</strong> Lat = Ladder (up/down = N/S). Long lines run left/right = E/W.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title"><span class="tag tag-blue">Visual</span> Geo clues in photos</div>
+          <div class="row"><span class="row-label">Signs</span><span class="row-val normal">Language, script, road sign style</span></div>
+          <div class="row"><span class="row-label">Architecture</span><span class="row-val normal">Building style reveals country/era</span></div>
+          <div class="row"><span class="row-label">Vegetation</span><span class="row-val normal">Tropical, desert, temperate, snowy</span></div>
+          <div class="row"><span class="row-label">Cars</span><span class="row-val normal">Plates, which side they drive on</span></div>
+          <div class="row"><span class="row-label">Sun angle</span><span class="row-val normal">Shadow direction hints hemisphere</span></div>
+          <div class="row"><span class="row-label">Landmarks</span><span class="row-val normal">Reverse image search unknown buildings</span></div>
+        </div>
+        <div class="card">
+          <div class="card-title"><span class="tag tag-amber">Metadata</span> What metadata reveals</div>
+          <div class="row"><span class="row-label">GPS Location</span><span class="row-val normal">Exact lat/long where photo was taken</span></div>
+          <div class="row"><span class="row-label">Device</span><span class="row-val normal">Phone or camera model used</span></div>
+          <div class="row"><span class="row-label">Timestamp</span><span class="row-val normal">Exact date and time of capture</span></div>
+          <div class="row"><span class="row-label">Software</span><span class="row-val normal">Photoshop, GIMP, OS version</span></div>
+          <div class="row"><span class="row-label">Author</span><span class="row-val normal">Creator name in Office docs</span></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:1.5rem;">
+        <div class="card-title">Quick reference links</div>
+        <div class="tool-row"><span class="tool-name">Yandex Images<a class="tool-link" href="https://yandex.com/images/" target="_blank" rel="noopener">yandex.com/images</a></span><span class="tool-desc">Best reverse image search for geolocation, better than Google for landscapes</span></div>
+        <div class="tool-row"><span class="tool-name">Wayback Machine<a class="tool-link" href="https://web.archive.org/" target="_blank" rel="noopener">web.archive.org</a></span><span class="tool-desc">View archived/deleted versions of any webpage</span></div>
+        <div class="tool-row"><span class="tool-name">SunCalc<a class="tool-link" href="https://www.suncalc.org/" target="_blank" rel="noopener">suncalc.org</a></span><span class="tool-desc">Estimate location/time from shadow direction and sun position</span></div>
+        <div class="tool-row"><span class="tool-name">OSINT Framework<a class="tool-link" href="https://osintframework.com/" target="_blank" rel="noopener">osintframework.com</a></span><span class="tool-desc">Massive categorized directory of OSINT tools for any task</span></div>
+        <div class="tool-row"><span class="tool-name">GTFOBins<a class="tool-link" href="https://gtfobins.github.io/" target="_blank" rel="noopener">gtfobins.github.io</a></span><span class="tool-desc">Unix binary privilege escalation reference, find privesc for any SUID/sudo binary</span></div>
+      </div>
+
+      <h2 style="font-size:16px; font-weight:700; margin-bottom:0.75rem;">Recon &amp; OSINT toolkit (from your arsenal)</h2>
+      <div class="legend">
+        <div class="legend-item"><span class="pri-badge pri-must">Must Master</span> Learn first, 80%+ of challenges</div>
+        <div class="legend-item"><span class="pri-badge pri-imp">Important</span> Expand once basics are down</div>
+        <div class="legend-item"><span class="pri-badge pri-use">Useful</span> Situational</div>
+      </div>
+      <div class="tool-grid" id="toolgrid-recon"></div>
+    </section>
+
+  
+    <section class="page" id="web">
+      <div class="page-header">
+        <div class="page-eyebrow">Category // Web</div>
+        <h1 class="page-title">Web Exploitation</h1>
+        <p class="page-desc">Finding and abusing bugs in websites, login forms, URLs, cookies, hidden pages. These challenges usually give you a URL to a live target.</p>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title"><span class="tag tag-blue">Recon</span> First things to check</div>
+          <div class="row"><span class="row-label">View Source</span><span class="row-val normal">Ctrl+U, comments often hide flags</span></div>
+          <div class="row"><span class="row-label">robots.txt</span><span class="row-val normal">/robots.txt may list hidden paths</span></div>
+          <div class="row"><span class="row-label">/.git/</span><span class="row-val normal">Exposed git folder leaks source code</span></div>
+          <div class="row"><span class="row-label">Cookies</span><span class="row-val normal">DevTools → Application → Cookies</span></div>
+          <div class="row"><span class="row-label">DevTools</span><span class="row-val normal">F12, Network tab shows hidden requests</span></div>
+          <div class="row"><span class="row-label">Directory brute</span><span class="row-val normal">gobuster/ffuf to find hidden pages</span></div>
+        </div>
+        <div class="card">
+          <div class="card-title"><span class="tag tag-purple">Injection</span> Common vulnerabilities</div>
+          <div class="row"><span class="row-label">SQL Injection</span><span class="row-val">' OR 1=1 --</span></div>
+          <div class="row"><span class="row-label">XSS</span><span class="row-val">&lt;script&gt;alert(1)&lt;/script&gt;</span></div>
+          <div class="row"><span class="row-label">Command Inj.</span><span class="row-val">; ls</span></div>
+          <div class="row"><span class="row-label">LFI/RFI</span><span class="row-val normal">Read server files via path traversal</span></div>
+          <div class="row"><span class="row-label">SSTI</span><span class="row-val">{{7*7}}</span></div>
+          <div class="row"><span class="row-label">IDOR</span><span class="row-val normal">Change ID in URL to access others' data</span></div>
+        </div>
+        <div class="card">
+          <div class="card-title"><span class="tag tag-teal">Auth</span> Authentication tricks</div>
+          <div class="row"><span class="row-label">Cookie tamper</span><span class="row-val normal">Edit cookie values (admin=false → true)</span></div>
+          <div class="row"><span class="row-label">JWT</span><span class="row-val normal">Decode at jwt.io, check "alg":"none"</span></div>
+          <div class="row"><span class="row-label">Default creds</span><span class="row-val normal">admin:admin, admin:password</span></div>
+          <div class="row"><span class="row-label">Forgot password</span><span class="row-val normal">Predictable reset tokens</span></div>
+          <div class="row"><span class="row-label">HTTP headers</span><span class="row-val normal">X-Forwarded-For, Referer bypass checks</span></div>
+        </div>
+        <div class="card">
+          <div class="card-title"><span class="tag tag-amber">Workflow</span> Web challenge workflow</div>
+          <div class="steps">
+            <div class="step"><div class="step-num">1</div><div class="step-text">View page source (Ctrl+U), check all comments</div></div>
+            <div class="step"><div class="step-num">2</div><div class="step-text">DevTools (F12), Console, Network, Storage tabs</div></div>
+            <div class="step"><div class="step-num">3</div><div class="step-text">Check <code>/robots.txt</code>, try <code>/admin</code>, <code>/login</code></div></div>
+            <div class="step"><div class="step-num">4</div><div class="step-text">Test every input for SQLi, XSS, command injection</div></div>
+            <div class="step"><div class="step-num">5</div><div class="step-text">Use Burp Suite to intercept and modify requests</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:1.5rem;">
+        <div class="card-title">Quick payload library</div>
+        <div class="callout" style="margin-bottom:12px;">Copy-paste starting points. Always tailor to the target's tech stack (DB type, language, framework).</div>
+        <div class="grid-2" style="margin-bottom:0;">
+          <div>
+            <div class="row"><span class="row-label">SQLi (login bypass)</span><span class="row-val">' OR '1'='1</span></div>
+            <div class="row"><span class="row-label">SQLi (UNION)</span><span class="row-val">' UNION SELECT NULL,NULL--</span></div>
+            <div class="row"><span class="row-label">XSS (no script)</span><span class="row-val">&lt;img src=x onerror=alert(1)&gt;</span></div>
+            <div class="row"><span class="row-label">Cmd injection</span><span class="row-val">; cat /etc/passwd</span></div>
+          </div>
+          <div>
+            <div class="row"><span class="row-label">SSTI (Jinja2)</span><span class="row-val">{{config}}</span></div>
+            <div class="row"><span class="row-label">LFI</span><span class="row-val">../../../../etc/passwd</span></div>
+            <div class="row"><span class="row-label">PHP wrapper</span><span class="row-val normal">php://filter/convert.base64-encode/resource=index.php</span></div>
+            <div class="row"><span class="row-label">NoSQL injection</span><span class="row-val">{"$ne": null}</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:1.5rem;">
+        <div class="card-title">Quick reference links</div>
+        <div class="tool-row"><span class="tool-name">jwt.io<a class="tool-link" href="https://jwt.io/" target="_blank" rel="noopener">jwt.io</a></span><span class="tool-desc">Decode and inspect JSON Web Tokens</span></div>
+        <div class="tool-row"><span class="tool-name">PayloadsAllTheThings<a class="tool-link" href="https://github.com/swisskyrepo/PayloadsAllTheThings" target="_blank" rel="noopener">github.com/PayloadsAllTheThings</a></span><span class="tool-desc">The bible, collection of payloads for every injection type</span></div>
+        <div class="tool-row"><span class="tool-name">HackTricks<a class="tool-link" href="https://book.hacktricks.xyz/" target="_blank" rel="noopener">book.hacktricks.xyz</a></span><span class="tool-desc">Massive web/pentest methodology wiki covering every technique</span></div>
+        <div class="tool-row"><span class="tool-name">PortSwigger Academy<a class="tool-link" href="https://portswigger.net/web-security" target="_blank" rel="noopener">portswigger.net/web-security</a></span><span class="tool-desc">Free, structured labs for every web vulnerability type</span></div>
+      </div>
+
+      <h2 style="font-size:16px; font-weight:700; margin-bottom:0.75rem;">Web exploitation toolkit (from your arsenal)</h2>
+      <div class="legend">
+        <div class="legend-item"><span class="pri-badge pri-must">Must Master</span> Learn first, 80%+ of challenges</div>
+        <div class="legend-item"><span class="pri-badge pri-imp">Important</span> Expand once basics are down</div>
+        <div class="legend-item"><span class="pri-badge pri-use">Useful</span> Situational</div>
+      </div>
+      <div class="tool-grid" id="toolgrid-web"></div>
+    </section>
+
+   
+    <section class="page" id="pwn">
+      <div class="page-header">
+        <div class="page-eyebrow">Category // Pwn</div>
+        <h1 class="page-title">Binary Exploitation &amp; Pwn</h1>
+        <p class="page-desc">Exploiting memory-safety bugs in compiled programs, buffer overflows, ROP chains, format strings, and shellcode. You're usually given a binary and a remote nc connection.</p>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title"><span class="tag tag-blue">Triage</span> First commands to run</div>
+          <div class="row"><span class="row-label">checksec</span><span class="row-val">checksec --file=binary</span></div>
+          <div class="row"><span class="row-label">file</span><span class="row-val normal">Confirm architecture and type</span></div>
+          <div class="row"><span class="row-label">strings</span><span class="row-val normal">Look for format strings, hints</span></div>
+          <div class="row"><span class="row-label">ROPgadget</span><span class="row-val normal">Find usable gadgets for chains</span></div>
+        </div>
+        <div class="card">
+          <div class="card-title"><span class="tag tag-purple">Mitigations</span> What checksec output means</div>
+          <div class="row"><span class="row-label">No NX</span><span class="row-val normal">Stack is executable → shellcode works</span></div>
+          <div class="row"><span class="row-label">No PIE</span><span class="row-val normal">Addresses fixed, easier ROP</span></div>
+          <div class="row"><span class="row-label">No canary</span><span class="row-val normal">Stack smashing without detection</span></div>
+          <div class="row"><span class="row-label">Partial RELRO</span><span class="row-val normal">GOT is writable → GOT overwrite</span></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:1.5rem;">
+        <div class="card-title">Common attack patterns</div>
+        <div class="steps">
+          <div class="step"><div class="step-num">1</div><div class="step-text"><strong>Buffer overflow:</strong> Use <code>cyclic(100)</code> to find the offset, overwrite return address</div></div>
+          <div class="step"><div class="step-num">2</div><div class="step-text"><strong>ret2win:</strong> Overwrite return address to jump straight to a win function</div></div>
+          <div class="step"><div class="step-num">3</div><div class="step-text"><strong>ret2libc:</strong> Leak a libc address, identify version via libc-database, calculate <code>system()</code> + <code>/bin/sh</code></div></div>
+          <div class="step"><div class="step-num">4</div><div class="step-text"><strong>Format string:</strong> <code>%x</code>/<code>%n</code> leaks or writes memory via printf-style bugs</div></div>
+          <div class="step"><div class="step-num">5</div><div class="step-text"><strong>ROP chain:</strong> Chain gadgets to set up registers and call functions with NX enabled</div></div>
+        </div>
+      </div>
+
+      <h2 style="font-size:16px; font-weight:700; margin-bottom:0.75rem;">Binary exploitation toolkit (from your arsenal)</h2>
+      <div class="legend">
+        <div class="legend-item"><span class="pri-badge pri-must">Must Master</span> Learn first, 80%+ of challenges</div>
+        <div class="legend-item"><span class="pri-badge pri-imp">Important</span> Expand once basics are down</div>
+        <div class="legend-item"><span class="pri-badge pri-use">Useful</span> Situational</div>
+      </div>
+      <div class="tool-grid" id="toolgrid-pwn"></div>
+    </section>
+
+
+    <section class="page" id="re">
+      <div class="page-header">
+        <div class="page-eyebrow">Category // RE</div>
+        <h1 class="page-title">Reverse Engineering</h1>
+        <p class="page-desc">Understanding what a compiled program does without source code, disassembly, decompilation, dynamic tracing, and unpacking. Often the path to a flag is buried in obfuscated logic.</p>
+      </div>
+
+      <div class="card" style="margin-bottom:1.5rem;">
+        <div class="card-title">Standard RE workflow</div>
+        <div class="steps">
+          <div class="step"><div class="step-num">1</div><div class="step-text">Run <code>file binary</code> and <code>strings binary | grep -i flag</code> first</div></div>
+          <div class="step"><div class="step-num">2</div><div class="step-text">Run Detect-It-Easy to check for packers (UPX etc.), unpack before analyzing</div></div>
+          <div class="step"><div class="step-num">3</div><div class="step-text">Open in Ghidra/IDA, read the decompiled <code>main()</code> first, rename variables as you understand them</div></div>
+          <div class="step"><div class="step-num">4</div><div class="step-text">Dynamically trace with <code>ltrace</code>/<code>strace</code> or GDB to watch comparisons like <code>strcmp(input, secret)</code></div></div>
+          <div class="step"><div class="step-num">5</div><div class="step-text">For complex input validation, model constraints in <code>angr</code> or <code>z3</code> and let the solver find the input</div></div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title"><span class="tag tag-blue">By platform</span> Choosing your tool</div>
+          <div class="row"><span class="row-label">Linux ELF</span><span class="row-val normal">Ghidra, IDA Free, Radare2</span></div>
+          <div class="row"><span class="row-label">.NET / C#</span><span class="row-val normal">dnSpy, full source, debuggable</span></div>
+          <div class="row"><span class="row-label">Android APK</span><span class="row-val normal">jadx, apktool</span></div>
+          <div class="row"><span class="row-label">Windows PE</span><span class="row-val normal">x64dbg, IDA, Binary Ninja</span></div>
+        </div>
+        <div class="card">
+          <div class="card-title"><span class="tag tag-purple">Quick wins</span> Don't miss these</div>
+          <div class="row"><span class="row-label">Strings first</span><span class="row-val normal">Many crackmes leak flags in plain strings</span></div>
+          <div class="row"><span class="row-label">Cross-references</span><span class="row-val normal">Find where the "wrong password" string is used</span></div>
+          <div class="row"><span class="row-label">Unpack first</span><span class="row-val normal">UPX-packed binaries show garbage until unpacked</span></div>
+          <div class="row"><span class="row-label">Patch &amp; run</span><span class="row-val normal">Sometimes patching a jump is faster than understanding it</span></div>
+        </div>
+      </div>
+
+      <h2 style="font-size:16px; font-weight:700; margin-bottom:0.75rem;">Reverse engineering toolkit (from your arsenal)</h2>
+      <div class="legend">
+        <div class="legend-item"><span class="pri-badge pri-must">Must Master</span> Learn first, 80%+ of challenges</div>
+        <div class="legend-item"><span class="pri-badge pri-imp">Important</span> Expand once basics are down</div>
+        <div class="legend-item"><span class="pri-badge pri-use">Useful</span> Situational</div>
+      </div>
+      <div class="tool-grid" id="toolgrid-re"></div>
+    </section>
+
+ 
+    <section class="page" id="forensics">
+      <div class="page-header">
+        <div class="page-eyebrow">Category // Forensics</div>
+        <h1 class="page-title">Forensics &amp; Steganography</h1>
+        <p class="page-desc">Analyzing files, memory dumps, network captures, and hidden data. Includes network analysis tools, packet inspection is forensics on the wire.</p>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title"><span class="tag tag-blue">Images</span> Image steganography</div>
+          <div class="row"><span class="row-label">LSB</span><span class="row-val normal">Data hidden in least significant pixel bits</span></div>
+          <div class="row"><span class="row-label">Metadata</span><span class="row-val normal">Flag in EXIF, XMP, or comment fields</span></div>
+          <div class="row"><span class="row-label">EOF data</span><span class="row-val normal">Extra data appended after image ends</span></div>
+          <div class="row"><span class="row-label">File-in-file</span><span class="row-val normal">ZIP/RAR/PDF hidden inside a JPG</span></div>
+          <div class="row"><span class="row-label">PNG chunks</span><span class="row-val normal">Extra chunks after IEND, tEXt/zTXt data</span></div>
+        </div>
+        <div class="card">
+          <div class="card-title"><span class="tag tag-purple">Audio &amp; text</span> Other stego</div>
+          <div class="row"><span class="row-label">Spectrogram</span><span class="row-val normal">Flag visible as frequency-domain image</span></div>
+          <div class="row"><span class="row-label">LSB audio</span><span class="row-val normal">Data in least significant bits of samples</span></div>
+          <div class="row"><span class="row-label">Zero-width</span><span class="row-val normal">Invisible Unicode chars between text</span></div>
+          <div class="row"><span class="row-label">Whitespace</span><span class="row-val normal">Spaces/tabs encode binary (SNOW)</span></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:1.5rem;">
+        <div class="card-title">Standard forensics workflow</div>
+        <div class="steps">
+          <div class="step"><div class="step-num">1</div><div class="step-text">Run <code>file &lt;target&gt;</code>, never trust the file extension</div></div>
+          <div class="step"><div class="step-num">2</div><div class="step-text">Run <code>strings &lt;target&gt; | grep -i flag</code>, quick win check first</div></div>
+          <div class="step"><div class="step-num">3</div><div class="step-text">Run <code>binwalk -e &lt;target&gt;</code>, extract embedded files/data</div></div>
+          <div class="step"><div class="step-num">4</div><div class="step-text">Check metadata: <code>exiftool &lt;target&gt;</code>, run <code>zsteg -a</code> on PNG/BMP</div></div>
+          <div class="step"><div class="step-num">5</div><div class="step-text">For .pcap, open in Wireshark, follow TCP streams, export HTTP objects</div></div>
+          <div class="step"><div class="step-num">6</div><div class="step-text">For memory dumps, Volatility: <code>imageinfo</code> → <code>pslist</code> → <code>cmdline</code> → <code>dumpfiles</code></div></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:1.5rem;">
+        <div class="card-title">File signature reference <span style="font-weight:400; color:var(--text-faint); font-size:11px; text-transform:none; letter-spacing:0;">- based on Gary Kessler's file signature table</span></div>
+        <div class="callout" style="margin-bottom:12px;"><strong>Why it matters:</strong> Files lie about their extension. The real type is determined by the first bytes (magic number). Use <code>xxd file | head</code> or this table to identify the true format, essential when a "JPG" won't open and you suspect an embedded archive or corrupted header.</div>
+        <input type="text" class="ascii-search" id="sigSearch" placeholder="Search by extension (e.g. PNG) or hex bytes (e.g. 89 50)..." oninput="filterSignatures()">
+        <div class="sig-scroll">
+          <table class="sig-table">
+            <thead><tr><th>Hex signature</th><th>Extension</th><th>Description</th></tr></thead>
+            <tbody id="sigBody">
+              <tr><td class="sig-hex">FF D8 FF E0</td><td class="sig-ext">JPG/JPEG</td><td>JFIF format image</td></tr>
+              <tr><td class="sig-hex">FF D8 FF E1</td><td class="sig-ext">JPG/JPEG</td><td>Exif format image</td></tr>
+              <tr><td class="sig-hex">FF D8 FF E8</td><td class="sig-ext">JPG/JPEG</td><td>SPIFF format image</td></tr>
+              <tr><td class="sig-hex">89 50 4E 47 0D 0A 1A 0A</td><td class="sig-ext">PNG</td><td>Portable Network Graphics file</td></tr>
+              <tr><td class="sig-hex">47 49 46 38 37 61</td><td class="sig-ext">GIF</td><td>GIF87a format image</td></tr>
+              <tr><td class="sig-hex">47 49 46 38 39 61</td><td class="sig-ext">GIF</td><td>GIF89a format image</td></tr>
+              <tr><td class="sig-hex">42 4D</td><td class="sig-ext">BMP</td><td>Bitmap image file</td></tr>
+              <tr><td class="sig-hex">49 49 2A 00</td><td class="sig-ext">TIF/TIFF</td><td>Tagged Image File Format (little-endian)</td></tr>
+              <tr><td class="sig-hex">4D 4D 00 2A</td><td class="sig-ext">TIF/TIFF</td><td>Tagged Image File Format (big-endian)</td></tr>
+              <tr><td class="sig-hex">00 00 01 00</td><td class="sig-ext">ICO</td><td>Windows icon file</td></tr>
+              <tr><td class="sig-hex">38 42 50 53</td><td class="sig-ext">PSD</td><td>Adobe Photoshop document</td></tr>
+              <tr><td class="sig-hex">25 50 44 46 2D</td><td class="sig-ext">PDF</td><td>Adobe Portable Document Format</td></tr>
+              <tr><td class="sig-hex">50 4B 03 04</td><td class="sig-ext">ZIP / DOCX / XLSX / PPTX / JAR / APK</td><td>ZIP archive (also Office Open XML, Java JAR, Android APK)</td></tr>
+              <tr><td class="sig-hex">50 4B 05 06</td><td class="sig-ext">ZIP</td><td>Empty ZIP archive</td></tr>
+              <tr><td class="sig-hex">50 4B 07 08</td><td class="sig-ext">ZIP</td><td>Spanned ZIP archive</td></tr>
+              <tr><td class="sig-hex">52 61 72 21 1A 07 00</td><td class="sig-ext">RAR</td><td>RAR archive version 1.5+</td></tr>
+              <tr><td class="sig-hex">52 61 72 21 1A 07 01 00</td><td class="sig-ext">RAR</td><td>RAR archive version 5.0+</td></tr>
+              <tr><td class="sig-hex">1F 8B 08</td><td class="sig-ext">GZ/GZIP</td><td>GZIP compressed file</td></tr>
+              <tr><td class="sig-hex">42 5A 68</td><td class="sig-ext">BZ2</td><td>BZIP2 compressed file</td></tr>
+              <tr><td class="sig-hex">37 7A BC AF 27 1C</td><td class="sig-ext">7Z</td><td>7-Zip compressed archive</td></tr>
+              <tr><td class="sig-hex">75 73 74 61 72 00 30 30</td><td class="sig-ext">TAR</td><td>TAR archive (POSIX ustar)</td></tr>
+              <tr><td class="sig-hex">4D 5A</td><td class="sig-ext">EXE/DLL</td><td>Windows/DOS executable (MZ header)</td></tr>
+              <tr><td class="sig-hex">7F 45 4C 46</td><td class="sig-ext">ELF</td><td>Linux/Unix executable and linkable format</td></tr>
+              <tr><td class="sig-hex">CA FE BA BE</td><td class="sig-ext">CLASS</td><td>Java class file</td></tr>
+              <tr><td class="sig-hex">23 21 2F</td><td class="sig-ext">SH</td><td>Unix script (shebang, #!/...)</td></tr>
+              <tr><td class="sig-hex">D0 CF 11 E0 A1 B1 1A E1</td><td class="sig-ext">DOC/XLS/PPT/MSI</td><td>Microsoft Office legacy / Compound File Binary Format</td></tr>
+              <tr><td class="sig-hex">25 21 50 53</td><td class="sig-ext">PS</td><td>PostScript file</td></tr>
+              <tr><td class="sig-hex">7B 5C 72 74 66</td><td class="sig-ext">RTF</td><td>Rich Text Format document</td></tr>
+              <tr><td class="sig-hex">3C 3F 78 6D 6C</td><td class="sig-ext">XML</td><td>XML document (text declaration)</td></tr>
+              <tr><td class="sig-hex">3C 21 44 4F 43</td><td class="sig-ext">HTML</td><td>HTML document (&lt;!DOC...)</td></tr>
+              <tr><td class="sig-hex">49 44 33</td><td class="sig-ext">MP3</td><td>MP3 audio with ID3v2 tag</td></tr>
+              <tr><td class="sig-hex">FF FB</td><td class="sig-ext">MP3</td><td>MP3 audio without ID3 tag (MPEG ADTS)</td></tr>
+              <tr><td class="sig-hex">52 49 46 46 ... 57 41 56 45</td><td class="sig-ext">WAV</td><td>RIFF/WAVE audio file (RIFF....WAVE)</td></tr>
+              <tr><td class="sig-hex">52 49 46 46 ... 41 56 49 20</td><td class="sig-ext">AVI</td><td>RIFF/AVI video file (RIFF....AVI )</td></tr>
+              <tr><td class="sig-hex">66 74 79 70 4D 34 41 20</td><td class="sig-ext">M4A</td><td>MPEG-4 audio file</td></tr>
+              <tr><td class="sig-hex">66 74 79 70 69 73 6F 6D</td><td class="sig-ext">MP4</td><td>MPEG-4 video / ISO base media file</td></tr>
+              <tr><td class="sig-hex">1A 45 DF A3</td><td class="sig-ext">MKV/WEBM</td><td>Matroska / WebM video container (EBML header)</td></tr>
+              <tr><td class="sig-hex">4F 67 67 53</td><td class="sig-ext">OGG</td><td>Ogg container (audio/video)</td></tr>
+              <tr><td class="sig-hex">66 4C 61 43</td><td class="sig-ext">FLAC</td><td>Free Lossless Audio Codec</td></tr>
+              <tr><td class="sig-hex">00 00 00 18 66 74 79 70 33 67 70 35</td><td class="sig-ext">3GP</td><td>3GPP multimedia file</td></tr>
+              <tr><td class="sig-hex">4D 54 68 64</td><td class="sig-ext">MID/MIDI</td><td>MIDI audio file</td></tr>
+              <tr><td class="sig-hex">53 51 4C 69 74 65 20 66 6F 72 6D 61 74 20 33 00</td><td class="sig-ext">DB/SQLITE</td><td>SQLite database file</td></tr>
+              <tr><td class="sig-hex">89 4A 46 49 46</td><td class="sig-ext">JFIF</td><td>JFIF image variant</td></tr>
+              <tr><td class="sig-hex">FF D8 FF EE</td><td class="sig-ext">JPG</td><td>JPEG with Adobe extension</td></tr>
+              <tr><td class="sig-hex">47 49 46</td><td class="sig-ext">GIF</td><td>GIF image (generic)</td></tr>
+              <tr><td class="sig-hex">4C 00 00 00 01 14 02 00</td><td class="sig-ext">LNK</td><td>Windows shortcut file</td></tr>
+              <tr><td class="sig-hex">4B 44 4D</td><td class="sig-ext">VMDK</td><td>VMware virtual disk descriptor</td></tr>
+              <tr><td class="sig-hex">EB 3C 90</td><td class="sig-ext">IMG/IMA</td><td>Floppy disk / boot sector image</td></tr>
+              <tr><td class="sig-hex">52 45 47 45 44 49 54 34</td><td class="sig-ext">REG</td><td>Windows Registry hive export</td></tr>
+              <tr><td class="sig-hex">66 4F 62 6A</td><td class="sig-ext">FLV</td><td>Flash video file</td></tr>
+              <tr><td class="sig-hex">43 57 53</td><td class="sig-ext">SWF</td><td>Flash SWF (compressed)</td></tr>
+              <tr><td class="sig-hex">46 57 53</td><td class="sig-ext">SWF</td><td>Flash SWF (uncompressed)</td></tr>
+              <tr><td class="sig-hex">4F 4E 32</td><td class="sig-ext">ONEPKG</td><td>OneNote package</td></tr>
+              <tr><td class="sig-hex">AC ED 00 05</td><td class="sig-ext">SER</td><td>Java serialized object</td></tr>
+              <tr><td class="sig-hex">28 B5 2F FD</td><td class="sig-ext">ZST</td><td>Zstandard compressed file</td></tr>
+              <tr><td class="sig-hex">FD 37 7A 58 5A 00</td><td class="sig-ext">XZ</td><td>XZ compressed file</td></tr>
+              <tr><td class="sig-hex">78 9C</td><td class="sig-ext">ZLIB</td><td>Zlib compressed data (default compression)</td></tr>
+              <tr><td class="sig-hex">30 26 B2 75 8E 66 CF 11</td><td class="sig-ext">WMV/ASF</td><td>Windows Media / ASF container</td></tr>
+              <tr><td class="sig-hex">78 61 72 21</td><td class="sig-ext">XAR</td><td>XAR archive (macOS)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:1.5rem;">
+        <div class="card-title">Quick reference links</div>
+        <div class="tool-row"><span class="tool-name">Aperi'Solve<a class="tool-link" href="https://aperisolve.fr/" target="_blank" rel="noopener">aperisolve.fr</a></span><span class="tool-desc">Runs binwalk, exiftool, strings, zsteg all at once on an uploaded image</span></div>
+        <div class="tool-row"><span class="tool-name">StegOnline<a class="tool-link" href="https://stegonline.georgeom.net/upload" target="_blank" rel="noopener">stegonline.georgeom.net</a></span><span class="tool-desc">Online LSB extraction and bit-plane viewer, no install needed</span></div>
+        <div class="tool-row"><span class="tool-name">Forensically<a class="tool-link" href="https://29a.ch/photo-forensics/" target="_blank" rel="noopener">29a.ch/photo-forensics</a></span><span class="tool-desc">Online image forensics, error level analysis, clone detection</span></div>
+        <div class="tool-row"><span class="tool-name">PacketTotal<a class="tool-link" href="https://packettotal.com/" target="_blank" rel="noopener">packettotal.com</a></span><span class="tool-desc">Upload a .pcap and get an instant online analysis report</span></div>
+        <div class="tool-row"><span class="tool-name">File Signatures (full)<a class="tool-link" href="https://www.garykessler.net/library/file_sigs.html" target="_blank" rel="noopener">garykessler.net/library/file_sigs.html</a></span><span class="tool-desc">The complete, canonical file signature reference, hundreds more entries</span></div>
+      </div>
+
+      <h2 style="font-size:16px; font-weight:700; margin-bottom:0.75rem;">Forensics &amp; steganography toolkit (from your arsenal)</h2>
+      <div class="legend">
+        <div class="legend-item"><span class="pri-badge pri-must">Must Master</span> Learn first, 80%+ of challenges</div>
+        <div class="legend-item"><span class="pri-badge pri-imp">Important</span> Expand once basics are down</div>
+        <div class="legend-item"><span class="pri-badge pri-use">Useful</span> Situational</div>
+      </div>
+      <div class="tool-grid" id="toolgrid-forensics"></div>
+
+      <h2 style="font-size:16px; font-weight:700; margin:1.75rem 0 0.75rem;">Network analysis toolkit</h2>
+      <div class="tool-grid" id="toolgrid-network"></div>
+    </section>
+
+  
+    <section class="page" id="passwords">
+      <div class="page-header">
+        <div class="page-eyebrow">Category // Passwords</div>
+        <h1 class="page-title">Password Cracking</h1>
+        <p class="page-desc">Identifying hash types, cracking with wordlists or masks, and brute-forcing online services. Speed comes from picking the right mode and the right wordlist.</p>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title"><span class="tag tag-blue">Workflow</span> Cracking workflow</div>
+          <div class="steps">
+            <div class="step"><div class="step-num">1</div><div class="step-text">Identify the hash type with <code>name-that-hash</code> or <code>hash-identifier</code></div></div>
+            <div class="step"><div class="step-num">2</div><div class="step-text">Convert file formats first: <code>zip2john</code>, <code>ssh2john</code>, <code>office2john</code></div></div>
+            <div class="step"><div class="step-num">3</div><div class="step-text">Start with <code>rockyou.txt</code> + hashcat mode <code>-m &lt;mode&gt;</code></div></div>
+            <div class="step"><div class="step-num">4</div><div class="step-text">Add mangling rules: <code>-r rules/best64.rule</code></div></div>
+            <div class="step"><div class="step-num">5</div><div class="step-text">For online logins, Hydra/Medusa with small targeted wordlists</div></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title"><span class="tag tag-amber">Common</span> Hashcat mode numbers</div>
+          <div class="row"><span class="row-label">MD5</span><span class="row-val">-m 0</span></div>
+          <div class="row"><span class="row-label">SHA1</span><span class="row-val">-m 100</span></div>
+          <div class="row"><span class="row-label">SHA256</span><span class="row-val">-m 1400</span></div>
+          <div class="row"><span class="row-label">NTLM</span><span class="row-val">-m 1000</span></div>
+          <div class="row"><span class="row-label">sha512crypt</span><span class="row-val">-m 1800</span></div>
+          <div class="row"><span class="row-label">bcrypt</span><span class="row-val">-m 3200</span></div>
+        </div>
+      </div>
+
+      <h2 style="font-size:16px; font-weight:700; margin-bottom:0.75rem;">Password cracking toolkit (from your arsenal)</h2>
+      <div class="legend">
+        <div class="legend-item"><span class="pri-badge pri-must">Must Master</span> Learn first, 80%+ of challenges</div>
+        <div class="legend-item"><span class="pri-badge pri-imp">Important</span> Expand once basics are down</div>
+        <div class="legend-item"><span class="pri-badge pri-use">Useful</span> Situational</div>
+      </div>
+      <div class="tool-grid" id="toolgrid-passwords"></div>
+    </section>
+
+   
+    <section class="page" id="wireless">
+      <div class="page-header">
+        <div class="page-eyebrow">Category // Wireless</div>
+        <h1 class="page-title">Wireless</h1>
+        <p class="page-desc">Wi-Fi auditing, handshake capture, PMKID attacks, and RF/SDR challenges. Less common in CTFs but appears in dedicated wireless categories.</p>
+      </div>
+
+      <div class="card" style="margin-bottom:1.5rem;">
+        <div class="card-title">WPA2 handshake capture workflow</div>
+        <div class="steps">
+          <div class="step"><div class="step-num">1</div><div class="step-text"><code>airmon-ng start wlan0</code>, enable monitor mode</div></div>
+          <div class="step"><div class="step-num">2</div><div class="step-text"><code>airodump-ng wlan0mon</code>, find target network and BSSID</div></div>
+          <div class="step"><div class="step-num">3</div><div class="step-text"><code>airodump-ng -c CH --bssid BSSID -w capture wlan0mon</code>, capture</div></div>
+          <div class="step"><div class="step-num">4</div><div class="step-text"><code>aireplay-ng -0 1 -a BSSID wlan0mon</code>, deauth to force handshake</div></div>
+          <div class="step"><div class="step-num">5</div><div class="step-text"><code>aircrack-ng -w rockyou.txt capture.cap</code>, crack</div></div>
+        </div>
+        <div class="callout" style="margin-top:12px; margin-bottom:0;"><strong>No client needed:</strong> Use <code>hcxdumptool</code> to capture PMKID, then <code>hashcat -m 22000</code>, no deauth required.</div>
+      </div>
+
+      <h2 style="font-size:16px; font-weight:700; margin-bottom:0.75rem;">Wireless toolkit (from your arsenal)</h2>
+      <div class="legend">
+        <div class="legend-item"><span class="pri-badge pri-imp">Important</span> Expand once basics are down</div>
+        <div class="legend-item"><span class="pri-badge pri-use">Useful</span> Situational</div>
+      </div>
+      <div class="tool-grid" id="toolgrid-wireless"></div>
+    </section>
+
+ 
+    <section class="page" id="frameworks">
+      <div class="page-header">
+        <div class="page-eyebrow">Category // Frameworks</div>
+        <h1 class="page-title">Exploitation Frameworks</h1>
+        <p class="page-desc">Full exploitation and post-exploitation suites, most relevant for Active Directory / Windows-domain CTFs (HackTheBox, ProLabs) and red-team style challenges.</p>
+      </div>
+
+      <div class="card" style="margin-bottom:1.5rem;">
+        <div class="card-title">Active Directory attack chain (typical)</div>
+        <div class="steps">
+          <div class="step"><div class="step-num">1</div><div class="step-text">Enumerate with <code>NetExec</code> / <code>impacket</code>, shares, users, SAM hashes</div></div>
+          <div class="step"><div class="step-num">2</div><div class="step-text">Run SharpHound, import into <code>BloodHound</code>, find privilege escalation paths</div></div>
+          <div class="step"><div class="step-num">3</div><div class="step-text">Kerberoast with <code>GetUserSPNs.py</code>, crack service account hashes offline</div></div>
+          <div class="step"><div class="step-num">4</div><div class="step-text">Get a shell with <code>evil-winrm</code> or <code>psexec.py</code></div></div>
+          <div class="step"><div class="step-num">5</div><div class="step-text">For exploit modules, <code>Metasploit</code>, <code>search cve:YYYY</code>, set RHOSTS/PAYLOAD, run</div></div>
+        </div>
+      </div>
+
+      <h2 style="font-size:16px; font-weight:700; margin-bottom:0.75rem;">Exploitation frameworks (from your arsenal)</h2>
+      <div class="legend">
+        <div class="legend-item"><span class="pri-badge pri-must">Must Master</span> Learn first, 80%+ of challenges</div>
+        <div class="legend-item"><span class="pri-badge pri-imp">Important</span> Expand once basics are down</div>
+        <div class="legend-item"><span class="pri-badge pri-use">Useful</span> Situational</div>
+      </div>
+      <div class="tool-grid" id="toolgrid-frameworks"></div>
+    </section>
+
+
+    <section class="page" id="utilities">
+      <div class="page-header">
+        <div class="page-eyebrow">Reference // Utilities</div>
+        <h1 class="page-title">Utilities &amp; Misc</h1>
+        <p class="page-desc">General-purpose tools, environments, and platforms that don't belong to one category but show up constantly, scripting, virtualization, note-taking, and where to practice.</p>
+      </div>
+
+      <div class="card" style="margin-bottom:1.5rem;">
+        <div class="card-title">Flag formats, what you're looking for</div>
+        <div class="callout" style="margin-bottom:12px;">Check the competition rules for the exact format. Common ones:</div>
+        <span class="flag">flag{th1s_is_the_flag}</span>
+        <span class="flag">CTF{hidden_message_here}</span>
+        <span class="flag">picoCTF{example_flag}</span>
+        <span class="flag">HTB{box_flag_here}</span>
+        <div style="font-size:13px; color:var(--text-faint); margin-top:10px;">If you find a string matching this curly-brace pattern, that's your flag. Submit it immediately.</div>
+      </div>
+
+      <h2 style="font-size:16px; font-weight:700; margin-bottom:0.75rem;">CTF utilities &amp; automation (from your arsenal)</h2>
+      <div class="legend">
+        <div class="legend-item"><span class="pri-badge pri-must">Must Master</span> Learn first, 80%+ of challenges</div>
+        <div class="legend-item"><span class="pri-badge pri-imp">Important</span> Expand once basics are down</div>
+        <div class="legend-item"><span class="pri-badge pri-use">Useful</span> Situational</div>
+      </div>
+      <div class="tool-grid" id="toolgrid-utilities"></div>
+
+      <h2 style="font-size:16px; font-weight:700; margin:1.75rem 0 0.75rem;">Miscellaneous (platforms, environments, references)</h2>
+      <div class="tool-grid" id="toolgrid-misc"></div>
+    </section>
+
+    <!-- SCRIPT GENERATOR -->
+    <section class="page" id="scripting">
+      <div class="page-header">
+        <div class="page-eyebrow">Workbench: Scripting</div>
+        <h1 class="page-title">Script Generator</h1>
+        <p class="page-desc">Generate custom Python or JavaScript scripts for your exact challenge using The Handler, or grab a ready-made template from the library below and adapt it. Every template includes an explanation of what it does and how to modify it.</p>
+      </div>
+
+      <div class="card" style="margin-bottom:1.5rem;">
+        <div class="card-title">Custom script generator</div>
+        <div class="callout" style="margin-bottom:12px;"><strong>Describe your need</strong> in plain English, e.g. "Python script to brute-force a 4-digit PIN over a socket connection" or "JS snippet to extract all base64 strings from a page and decode them". The generator writes a ready-to-run script with comments explaining each part.</div>
+
+        <div style="display:flex; gap:10px; margin-bottom:12px; flex-wrap:wrap;">
+          <button class="filter-btn active" id="langPython" onclick="setScriptLang('python')">Python</button>
+          <button class="filter-btn" id="langJS" onclick="setScriptLang('javascript')">JavaScript</button>
+        </div>
+
+        <textarea class="helper-prompt" id="scriptPrompt" style="margin-top:0;" placeholder="Describe the script you need, e.g. 'Connect to a remote service over a socket, send an XOR-decoded payload, and read the response in a loop until a flag appears'"></textarea>
+
+        <div class="helper-suggest">
+          <span class="helper-suggest-btn" onclick="setScriptPrompt('Write a script that connects to a remote nc service, sends a payload, and reads the response in a loop.')">Pwn connect loop</span>
+          <span class="helper-suggest-btn" onclick="setScriptPrompt('Write a script that brute-forces a single-byte XOR key against a hex-encoded ciphertext and prints all printable results.')">XOR brute force</span>
+          <span class="helper-suggest-btn" onclick="setScriptPrompt('Write a script that sends HTTP requests to a login form with a list of passwords and detects a successful login by response length or status code.')">Web login bruteforce</span>
+          <span class="helper-suggest-btn" onclick="setScriptPrompt('Write a script that solves a basic RSA challenge given n, e, and c by factoring n and computing the private key.')">RSA solver</span>
+        </div>
+
+        <button class="helper-submit" id="scriptSubmit" onclick="runScriptGenerator()">Generate script</button>
+        <div id="scriptOutput" class="helper-output"></div>
+      </div>
+
+      <h2 style="font-size:16px; font-weight:700; margin-bottom:0.75rem;">Template library</h2>
+      <div class="callout" style="margin-bottom:1rem;">Ready-to-use templates, click "Copy" to grab the code. Each includes inline comments and an explanation of what to change for your challenge.</div>
+
+      <div class="filter-bar" id="scriptCategoryFilter">
+        <button class="filter-btn active" data-cat="all" onclick="filterScriptTemplates('all', this)">All</button>
+        <button class="filter-btn" data-cat="pwn" onclick="filterScriptTemplates('pwn', this)">Pwn</button>
+        <button class="filter-btn" data-cat="crypto" onclick="filterScriptTemplates('crypto', this)">Crypto</button>
+        <button class="filter-btn" data-cat="web" onclick="filterScriptTemplates('web', this)">Web</button>
+        <button class="filter-btn" data-cat="forensics" onclick="filterScriptTemplates('forensics', this)">Forensics</button>
+        <button class="filter-btn" data-cat="misc" onclick="filterScriptTemplates('misc', this)">Misc</button>
+      </div>
+
+      <div id="scriptTemplateList"></div>
+    </section>
+
+
+    <section class="page" id="cheatsheets">
+      <div class="page-header">
+        <div class="page-eyebrow">Reference: Cheatsheets</div>
+        <h1 class="page-title">Cheatsheets &amp; Checklists</h1>
+        <p class="page-desc">Quick-reference definitions for the basics across every category, plus a universal checklist to run through on any new challenge.</p>
+      </div>
+
+      <div class="card" style="margin-bottom:1.5rem;">
+        <div class="card-title">Universal challenge checklist</div>
+        <div class="callout" style="margin-bottom:12px;">Run through this before going deep on any challenge. Most "impossible" challenges are solved by step 1-4.</div>
+        <div class="steps">
+          <div class="step"><div class="step-num">1</div><div class="step-text">Read the challenge title and description twice, the wording is usually a hint toward the category or technique</div></div>
+          <div class="step"><div class="step-num">2</div><div class="step-text">Run <code>file</code> on every provided file, never trust the extension</div></div>
+          <div class="step"><div class="step-num">3</div><div class="step-text">Run <code>strings &lt;file&gt; | grep -iE "flag|ctf|key|pass"</code> on every file</div></div>
+          <div class="step"><div class="step-num">4</div><div class="step-text">Check metadata with <code>exiftool</code> on any image/document/PDF</div></div>
+          <div class="step"><div class="step-num">5</div><div class="step-text">If it's a binary, run <code>checksec</code> and open in Ghidra alongside dynamic testing</div></div>
+          <div class="step"><div class="step-num">6</div><div class="step-text">If it's text/ciphertext, paste into this site's Multi-Decoder and CyberChef Magic</div></div>
+          <div class="step"><div class="step-num">7</div><div class="step-text">If it's a network capture, open in Wireshark and Follow every TCP/UDP stream</div></div>
+          <div class="step"><div class="step-num">8</div><div class="step-text">If stuck after 15-20 minutes, search "&lt;category&gt; &lt;keyword from description&gt; CTF writeup"</div></div>
+          <div class="step"><div class="step-num">9</div><div class="step-text">Note every tool/technique tried, this prevents repeating dead ends and builds your personal knowledge base</div></div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title"><span class="tag tag-blue">Crypto</span> Quick definitions</div>
+          <div class="row"><span class="row-label normal">Plaintext</span><span class="row-val normal">The original, unencrypted message</span></div>
+          <div class="row"><span class="row-label normal">Ciphertext</span><span class="row-val normal">The encrypted/encoded output</span></div>
+          <div class="row"><span class="row-label normal">Key</span><span class="row-val normal">The secret value controlling encryption/decryption</span></div>
+          <div class="row"><span class="row-label normal">Encoding</span><span class="row-val normal">Reversible transformation, no secret needed (Base64, Hex)</span></div>
+          <div class="row"><span class="row-label normal">Encryption</span><span class="row-val normal">Reversible only with the correct key</span></div>
+          <div class="row"><span class="row-label normal">Hashing</span><span class="row-val normal">One-way transformation, not reversible by design</span></div>
+          <div class="row"><span class="row-label normal">Nonce/IV</span><span class="row-val normal">Random value used once to randomize encryption output</span></div>
+        </div>
+        <div class="card">
+          <div class="card-title"><span class="tag tag-purple">Web</span> Quick definitions</div>
+          <div class="row"><span class="row-label normal">XSS</span><span class="row-val normal">Injecting JavaScript that runs in another user's browser</span></div>
+          <div class="row"><span class="row-label normal">CSRF</span><span class="row-val normal">Forcing a logged-in user's browser to make unwanted requests</span></div>
+          <div class="row"><span class="row-label normal">SSRF</span><span class="row-val normal">Tricking a server into making requests on your behalf</span></div>
+          <div class="row"><span class="row-label normal">IDOR</span><span class="row-val normal">Accessing other users' data by changing an ID/reference</span></div>
+          <div class="row"><span class="row-label normal">SSTI</span><span class="row-val normal">Injecting code into a server-side template engine</span></div>
+          <div class="row"><span class="row-label normal">RCE</span><span class="row-val normal">Remote Code Execution, running arbitrary commands on the server</span></div>
+        </div>
+        <div class="card">
+          <div class="card-title"><span class="tag tag-teal">Pwn / RE</span> Quick definitions</div>
+          <div class="row"><span class="row-label normal">Stack</span><span class="row-val normal">Memory region for local variables and return addresses</span></div>
+          <div class="row"><span class="row-label normal">Heap</span><span class="row-val normal">Memory region for dynamically allocated data</span></div>
+          <div class="row"><span class="row-label normal">Canary</span><span class="row-val normal">Value placed before return address to detect overflow</span></div>
+          <div class="row"><span class="row-label normal">PIE</span><span class="row-val normal">Position Independent Executable, randomized base address</span></div>
+          <div class="row"><span class="row-label normal">ASLR</span><span class="row-val normal">Address Space Layout Randomization, randomizes memory layout</span></div>
+          <div class="row"><span class="row-label normal">Shellcode</span><span class="row-val normal">Machine code that spawns a shell when executed</span></div>
+          <div class="row"><span class="row-label normal">Gadget</span><span class="row-val normal">Short instruction sequence ending in 'ret', used in ROP chains</span></div>
+        </div>
+        <div class="card">
+          <div class="card-title"><span class="tag tag-amber">Forensics</span> Quick definitions</div>
+          <div class="row"><span class="row-label normal">Magic bytes</span><span class="row-val normal">First few bytes identifying true file type</span></div>
+          <div class="row"><span class="row-label normal">Carving</span><span class="row-val normal">Extracting embedded files from a larger file by signature</span></div>
+          <div class="row"><span class="row-label normal">Slack space</span><span class="row-val normal">Unused space at the end of a disk block, can hide data</span></div>
+          <div class="row"><span class="row-label normal">Steganography</span><span class="row-val normal">Hiding data inside another file without changing its appearance</span></div>
+          <div class="row"><span class="row-label normal">Memory dump</span><span class="row-val normal">Snapshot of a system's RAM at a point in time</span></div>
+          <div class="row"><span class="row-label normal">EXIF</span><span class="row-val normal">Metadata standard embedded in image files</span></div>
+        </div>
+        <div class="card">
+          <div class="card-title"><span class="tag tag-green">Networking</span> Quick definitions</div>
+          <div class="row"><span class="row-label normal">PCAP</span><span class="row-val normal">File format for captured network packets</span></div>
+          <div class="row"><span class="row-label normal">TCP stream</span><span class="row-val normal">A full conversation between two hosts over TCP</span></div>
+          <div class="row"><span class="row-label normal">DNS exfil</span><span class="row-val normal">Hiding data inside DNS query subdomains</span></div>
+          <div class="row"><span class="row-label normal">Port scan</span><span class="row-val normal">Probing a host for open network services</span></div>
+          <div class="row"><span class="row-label normal">MITM</span><span class="row-val normal">Man-in-the-middle, intercepting traffic between two parties</span></div>
+        </div>
+        <div class="card">
+          <div class="card-title"><span class="tag tag-red">General</span> Common abbreviations</div>
+          <div class="row"><span class="row-label normal">CTF</span><span class="row-val normal">Capture The Flag</span></div>
+          <div class="row"><span class="row-label normal">OSINT</span><span class="row-val normal">Open Source Intelligence</span></div>
+          <div class="row"><span class="row-label normal">LFI / RFI</span><span class="row-val normal">Local / Remote File Inclusion</span></div>
+          <div class="row"><span class="row-label normal">PoC</span><span class="row-val normal">Proof of Concept</span></div>
+          <div class="row"><span class="row-label normal">CVE</span><span class="row-val normal">Common Vulnerabilities and Exposures (public vuln ID)</span></div>
+          <div class="row"><span class="row-label normal">0day</span><span class="row-val normal">Vulnerability with no public patch available yet</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Category recognition cheatsheet</div>
+        <div class="callout" style="margin-bottom:12px;">Quick signals for which category a challenge belongs to, when it's ambiguous.</div>
+        <div class="tool-row"><span class="tool-name">Crypto</span><span class="tool-desc">Mentions "encrypt", "key", "cipher"; gives you ciphertext, a public key, or N/e/c values</span></div>
+        <div class="tool-row"><span class="tool-name">Web</span><span class="tool-desc">Gives you a URL/link to a live site or Docker container exposing a port</span></div>
+        <div class="tool-row"><span class="tool-name">Pwn</span><span class="tool-desc">Gives you a binary plus an nc host:port to connect to</span></div>
+        <div class="tool-row"><span class="tool-name">Reverse Engineering</span><span class="tool-desc">Gives you a binary/APK with no remote connection, asks you to find a "valid input" or "serial"</span></div>
+        <div class="tool-row"><span class="tool-name">Forensics</span><span class="tool-desc">Gives you a file (image, pcap, memory dump, disk image) and asks "what happened" or "find the flag"</span></div>
+        <div class="tool-row"><span class="tool-name">Steganography</span><span class="tool-desc">Gives you a single image or audio file with no other context</span></div>
+        <div class="tool-row"><span class="tool-name">OSINT</span><span class="tool-desc">Gives you a photo, username, or social media profile and asks "where/who/when"</span></div>
+      </div>
+    </section>
+
+   
+    <section class="page" id="tips">
+      <div class="page-header">
+        <div class="page-eyebrow">Reference // Mindset</div>
+        <h1 class="page-title">Quick Tips &amp; Mindset</h1>
+        <p class="page-desc">The habits and instincts that separate fast solves from hours of frustration.</p>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title"><span class="tag tag-blue">Strategy</span> When you're stuck</div>
+          <div class="steps">
+            <div class="step"><div class="step-num">1</div><div class="step-text">Re-read the challenge name and description, hints are always hidden there</div></div>
+            <div class="step"><div class="step-num">2</div><div class="step-text">Try the simplest tools first: <code>strings</code>, <code>file</code>, <code>exiftool</code></div></div>
+            <div class="step"><div class="step-num">3</div><div class="step-text">Paste into CyberChef and use "Magic" auto-detect mode</div></div>
+            <div class="step"><div class="step-num">4</div><div class="step-text">Search: "[challenge category] CTF writeup" for similar solved problems</div></div>
+            <div class="step"><div class="step-num">5</div><div class="step-text">Take a short break, fresh eyes solve more than frustration does</div></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title"><span class="tag tag-green">Mindset</span> Operator mindset</div>
+          <div class="row"><span class="row-label normal">Question everything</span><span class="row-val normal">Nothing is what it first seems</span></div>
+          <div class="row"><span class="row-label normal">Layer by layer</span><span class="row-val normal">Clues are often nested, decode then decode again</span></div>
+          <div class="row"><span class="row-label normal">Read the hints</span><span class="row-val normal">The challenge description IS a hint</span></div>
+          <div class="row"><span class="row-label normal">Document it</span><span class="row-val normal">Write down every tool and step you tried</span></div>
+          <div class="row"><span class="row-label normal">Community</span><span class="row-val normal">Discord servers and Reddit have nudges</span></div>
+          <div class="row"><span class="row-label normal">Post-solve</span><span class="row-val normal">Read others' writeups to learn 10x more</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Common "rabbit hole" traps</div>
+        <div class="callout">These waste your time. Move on when you hit them.</div>
+        <div class="row"><span class="row-label normal">Wrong tool</span><span class="row-val normal">No output after 2 tries? Move on, don't force it</span></div>
+        <div class="row"><span class="row-label normal">Over-encoding</span><span class="row-val normal">Base64 of Base64 is possible, keep layering if still gibberish</span></div>
+        <div class="row"><span class="row-label normal">Noise pixels</span><span class="row-val normal">Not every pixel variation is LSB steganography</span></div>
+        <div class="row"><span class="row-label normal">Wrong key</span><span class="row-val normal">If output is gibberish after decoding, you likely have the wrong cipher/key</span></div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+</body>
+</html>
