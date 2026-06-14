@@ -315,3 +315,17 @@ hr.divider { border: none; border-top: 1px solid var(--border); margin: 1.75rem 
 
 .section-divider { border: none; border-top: 1px solid var(--border); margin: 1.75rem 0; }
 .section-h2 { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: .75rem; }
+
+
+.osint-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.osint-empty { font-size: 13px; color: var(--text-faint); padding: 4px 0; font-style: italic; }
+.osint-input-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.osint-input-row:last-child { margin-bottom: 0; }
+.osint-input-label { font-size: 12px; font-weight: 700; color: var(--accent); font-family: var(--mono); min-width: 70px; text-transform: lowercase; }
+.osint-input { flex: 1; background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; font-size: 13px; color: var(--text); font-family: var(--mono); transition: border-color var(--tr); }
+.osint-input:focus { outline: none; border-color: var(--accent); }
+.osint-input::placeholder { color: var(--text-faint); font-family: var(--sans); }
+.osint-remove-btn { background: none; border: 1px solid var(--border); border-radius: 5px; color: var(--text-faint); cursor: pointer; font-size: 16px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; transition: all var(--tr); }
+.osint-remove-btn:hover { color: var(--red); border-color: var(--red); background: color-mix(in srgb, var(--red) 8%, transparent); }
+.osint-query { font-family: var(--mono); font-size: 14px; color: var(--text); padding: 10px 12px; background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--r); min-height: 44px; word-break: break-all; line-height: 1.6; }
+.osint-query-placeholder { font-style: italic; color: var(--text-faint); font-family: var(--sans); font-size: 13px; }

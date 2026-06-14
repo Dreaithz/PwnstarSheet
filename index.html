@@ -93,6 +93,7 @@
       <button class="nav-item" onclick="show('ascii',this)">ASCII Table</button>
       <button class="nav-item" onclick="show('handler',this)">The Handler</button>
       <button class="nav-item" onclick="show('scripting',this)">Script Generator</button>
+      <button class="nav-item" onclick="show('dorkbuilder',this)">Dork Builder</button>
 
       <div class="nav-group-label">Reference</div>
       <button class="nav-item" onclick="show('utilities',this)">Utilities and Misc</button>
@@ -202,6 +203,48 @@
     <button class="filter-btn" onclick="filterTemplates('misc',this)">Misc</button>
   </div>
   <div id="scriptTemplateList"></div>
+</section>
+
+
+<section class="page" id="dorkbuilder">
+  <div class="page-header">
+    <div class="page-eyebrow">Workbench</div>
+    <h1 class="page-title">Dork Builder</h1>
+    <p class="page-desc">Build Google dork queries by combining operators. Click a tag to add a filter, type your value, and copy the final query.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Operators</div>
+    <div class="osint-tags" id="osintTags">
+      <button class="filter-btn osint-tag-btn" data-tag="site" onclick="toggleOsintTag('site')">site:</button>
+      <button class="filter-btn osint-tag-btn" data-tag="intitle" onclick="toggleOsintTag('intitle')">intitle:</button>
+      <button class="filter-btn osint-tag-btn" data-tag="inurl" onclick="toggleOsintTag('inurl')">inurl:</button>
+      <button class="filter-btn osint-tag-btn" data-tag="intext" onclick="toggleOsintTag('intext')">intext:</button>
+      <button class="filter-btn osint-tag-btn" data-tag="filetype" onclick="toggleOsintTag('filetype')">filetype:</button>
+      <button class="filter-btn osint-tag-btn" data-tag="inanchor" onclick="toggleOsintTag('inanchor')">inanchor:</button>
+      <button class="filter-btn osint-tag-btn" data-tag="link" onclick="toggleOsintTag('link')">link:</button>
+      <button class="filter-btn osint-tag-btn" data-tag="cache" onclick="toggleOsintTag('cache')">cache:</button>
+      <button class="filter-btn osint-tag-btn" data-tag="related" onclick="toggleOsintTag('related')">related:</button>
+      <button class="filter-btn osint-tag-btn" data-tag="info" onclick="toggleOsintTag('info')">info:</button>
+      <button class="filter-btn osint-tag-btn" data-tag="allinurl" onclick="toggleOsintTag('allinurl')">allinurl:</button>
+      <button class="filter-btn osint-tag-btn" data-tag="allintitle" onclick="toggleOsintTag('allintitle')">allintitle:</button>
+      <button class="filter-btn osint-tag-btn" data-tag="allintext" onclick="toggleOsintTag('allintext')">allintext:</button>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:1.25rem;">
+    <div class="card-title">Active filters</div>
+    <div id="osintInputs"><div class="osint-empty">Click an operator above to add a filter.</div></div>
+  </div>
+
+  <div class="card" style="margin-top:1.25rem;">
+    <div class="card-title">Query</div>
+    <div class="osint-query" id="osintQuery"><span class="osint-query-placeholder">Add a filter to build your query...</span></div>
+    <div style="display:flex;gap:8px;margin-top:10px;">
+      <button class="helper-submit osint-copy-btn" onclick="copyOsintQuery()">Copy query</button>
+      <button class="helper-submit" onclick="clearOsintTags()" style="background:transparent;color:var(--red);border-color:var(--red);">Clear all</button>
+    </div>
+  </div>
 </section>
 
 

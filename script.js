@@ -407,3 +407,92 @@ document.addEventListener('keydown', e => {
   }
 });
 
+
+const osintActive = {};
+
+function toggleOsintTag(tag) {
+  if (osintActive[tag] !== undefined) {
+    delete osintActive[tag];
+  } else {
+    osintActive[tag] = '';
+  }
+  renderOsintInputs();
+  updateOsintQuery();
+  updateOsintButtons();
+}
+
+function renderOsintInputs() {
+  const container = document.getElementById('osintInputs');
+  if (!container) return;
+  const tags = Object.keys(osintActive);
+  if (tags.length === 0) {
+    container.innerHTML = '<div class="osint-empty">Click an operator above to add a filter.</div>';
+    return;
+  }
+  container.innerHTML = tags.map(tag =>
+    `<div class="osint-input-row">
+      <span class="osint-input-label">${tag}:</span>
+      <input type="text" class="osint-input" placeholder='Enter value for "${tag}"...' value="${escHtml(osintActive[tag])}" oninput="updateOsintVal('${tag}', this.value)" spellcheck="false">
+      <button class="osint-remove-btn" onclick="removeOsintTag('${tag}')" title="Remove">&times;</button>
+    </div>`
+  ).join('');
+  const inputs = container.querySelectorAll('.osint-input');
+  if (inputs.length) inputs[inputs.length - 1].focus();
+}
+
+function updateOsintVal(tag, val) {
+  osintActive[tag] = val;
+  updateOsintQuery();
+}
+
+function removeOsintTag(tag) {
+  delete osintActive[tag];
+  renderOsintInputs();
+  updateOsintQuery();
+  updateOsintButtons();
+}
+
+function updateOsintQuery() {
+  const el = document.getElementById('osintQuery');
+  if (!el) return;
+  const parts = [];
+  for (const [tag, val] of Object.entries(osintActive)) {
+    if (val.trim()) {
+      parts.push(`${tag}: "${val}"`);
+    }
+  }
+  if (parts.length === 0) {
+    el.innerHTML = '<span class="osint-query-placeholder">Add a filter to build your query...</span>';
+  } else {
+    el.textContent = parts.join(' ');
+  }
+}
+
+function updateOsintButtons() {
+  document.querySelectorAll('.osint-tag-btn').forEach(btn => {
+    const tag = btn.dataset.tag;
+    btn.classList.toggle('active', osintActive[tag] !== undefined);
+  });
+}
+
+function copyOsintQuery() {
+  const el = document.getElementById('osintQuery');
+  if (!el) return;
+  const text = el.textContent;
+  if (!text || el.querySelector('.osint-query-placeholder')) return;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.querySelector('.osint-copy-btn');
+    if (!btn) return;
+    const o = btn.textContent;
+    btn.textContent = 'Copied!';
+    setTimeout(() => btn.textContent = o, 1200);
+  }).catch(() => {});
+}
+
+function clearOsintTags() {
+  Object.keys(osintActive).forEach(k => delete osintActive[k]);
+  renderOsintInputs();
+  updateOsintQuery();
+  updateOsintButtons();
+}
+
